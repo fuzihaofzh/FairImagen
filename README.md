@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎨 FairImagen
+# 🎨 FairImagen （Neurips2025）
 
 ### Post-Processing for Bias Mitigation in Text-to-Image Models
 
