@@ -177,7 +177,7 @@ pip install -r requirements.txt
 
 ## 📂 Data
 
-- Prompt lists reside in `rls-minimal/data/`
+- Prompt lists reside in `FairImagen/data/`
 - **`test.json`** phrasing: `"Generate a photo of a face of a <role>"`
 - **`dev.json`** contains 30 prompts with the same phrasing and does not overlap with `test.json`
 
@@ -245,7 +245,7 @@ pip install -r requirements.txt
   <tbody>
     <tr>
       <td><code>data</code></td>
-      <td>Dataset name (uses <code>rls-minimal/data/{name}.json</code>)</td>
+      <td>Dataset name (uses <code>FairImagen/data/{name}.json</code>)</td>
       <td><code>test</code>, <code>dev</code></td>
     </tr>
     <tr>
