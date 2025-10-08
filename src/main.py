@@ -10,15 +10,6 @@ import tqdm
 from PIL import Image
 from eval_tool import *
 from fairpca_processor import *
-from sal_processor import *
-from clip_processor import *
-from embedding_processor import *
-from fpt_processor import *
-from cda_processor import *
-from tbd_processor import *
-from sdid_processor import *
-from iti_processor import *
-from fairqueue_processor import *
 from sdpipline import UserStableDiffusion3Pipeline
 from pipeline_factory import create_pipeline, get_supported_pipelines, get_pipeline_info
 from pipeline_adapters import create_adapted_pipeline
@@ -230,31 +221,10 @@ def main(usermode_str = "data=dev,protect=[gender]", extramode_str = ""):
     
     pipe = pipe.to("cuda")
     if "proc" in usermode:
-        if usermode["proc"] == "cmove":
-            pipe.processor = CentroidMover()
-        elif usermode["proc"] == "fpca":
+        if usermode["proc"] == "fpca":
             pipe.processor = FairPCAProcessor()
         elif usermode["proc"] == "base":
             pipe.processor = BaseProcessor()
-        elif usermode["proc"] == "fpt":
-            pipe.processor = FairPromptProcessor()
-        elif usermode["proc"] == "t2i":
-            from fairt2i_processor import FairT2I
-            pipe.processor = FairT2I()
-        elif usermode["proc"] == "cda":
-            pipe.processor = CDAProcessor()
-        elif usermode["proc"] == "SAL":
-            pipe.processor = SALProcessor()
-        elif usermode["proc"] == "tbd":
-            pipe.processor = TBDProcessor()
-        elif usermode["proc"] == "ClipCoco":
-            pipe.processor = ClipCocoProcessor()
-        elif usermode["proc"] == "sdid":
-            pipe.processor = SDIDProcessor()
-        elif usermode["proc"] == "iti":
-            pipe.processor = ITIProcessor()
-        elif usermode["proc"] == "fairqueue":
-            pipe.processor = FairQueueProcessor()
     else:
         pipe.processor = FairPCAProcessor()
     
