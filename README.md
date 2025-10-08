@@ -194,7 +194,7 @@ pip install -r requirements.txt
 
 </details>
 
-<details>
+<details open>
 <summary><b>FairPCA debiasing (gender)</b></summary>
 
 ```bash
@@ -203,7 +203,7 @@ pip install -r requirements.txt
 
 </details>
 
-<details>
+<details open>
 <summary><b>FairPCA with T5 encoder</b></summary>
 
 ```bash
@@ -212,7 +212,7 @@ pip install -r requirements.txt
 
 </details>
 
-<details>
+<details open>
 <summary><b>FairPCA with OpenCLIP encoder</b></summary>
 
 ```bash
@@ -221,7 +221,7 @@ pip install -r requirements.txt
 
 </details>
 
-<details>
+<details open>
 <summary><b>Multi-attribute with cross interactions (gender and race)</b></summary>
 
 ```bash
