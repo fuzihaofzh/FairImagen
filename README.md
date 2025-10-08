@@ -20,11 +20,11 @@
 </p>
 
 <p>
-  <sup>1</sup>The Chinese University of Hong Kong ·
-  <sup>2</sup>University of Oxford ·
-  <sup>3</sup>University of Cambridge<br/>
-  <sup>4</sup>Oxford Internet Institute ·
-  <sup>5</sup>Trinity College Dublin
+  <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/CUHK_Emblem_%281973-2008%29.svg" height="16" alt="CUHK"/> <sup>1</sup>The Chinese University of Hong Kong ·
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Uni_Oxford_logo.svg" height="16" alt="Oxford"/> <sup>2</sup>University of Oxford ·
+  <img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Coat_of_Arms_of_the_University_of_Cambridge.svg" height="16" alt="Cambridge"/> <sup>3</sup>University of Cambridge<br/>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Uni_Oxford_logo.svg" height="16" alt="OII"/> <sup>4</sup>University of Oxford ·
+  <img src="https://upload.wikimedia.org/wikipedia/commons/7/7f/Trinity_College_Dublin_Arms.svg" height="16" alt="TCD"/> <sup>5</sup>Trinity College Dublin
 </p>
 
 <p>
