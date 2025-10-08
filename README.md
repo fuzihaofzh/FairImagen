@@ -189,7 +189,7 @@ pip install -r requirements.txt
 <summary><b>Baseline (no debiasing)</b></summary>
 
 ```bash
-./scripts/run.sh "data=test,protect=[gender,race]" "proc=base"
+./scripts/run.sh "data=test,protect=[gender]" "proc=base"
 ```
 
 </details>
