@@ -225,7 +225,7 @@ pip install -r requirements.txt
 <summary><b>Multi-attribute with cross interactions (gender and race)</b></summary>
 
 ```bash
-./scripts/run.sh "data=test,protect=[gender,race]" "proc=fpca,remove,enoise=0.6,hdim=1800,cross"
+./scripts/run.sh "data=test,protect=[gender,race]" "proc=fpca,remove,enoise=0.6,hdim=1400,cross"
 ```
 
 </details>
