@@ -1,42 +1,64 @@
-from typing import Any, Callable, Dict, List, Optional, Union
-from diffusers import StableDiffusion3Pipeline
-from diffusers.pipelines.stable_diffusion_3.pipeline_stable_diffusion_3 import *
+"""Custom Stable Diffusion 3 pipeline with fairness support.
+
+This module extends the diffusers SD3 pipeline to support FairPCA
+embedding modifications for demographic bias mitigation.
+"""
+
+from collections.abc import Callable
+from typing import Any
+
 import torch
+from diffusers import StableDiffusion3Pipeline
+from diffusers.pipelines.stable_diffusion_3.pipeline_stable_diffusion_3 import (
+    EXAMPLE_DOC_STRING,
+    XLA_AVAILABLE,
+    StableDiffusion3PipelineOutput,
+    replace_example_docstring,
+    retrieve_timesteps,
+)
+
+try:
+    import torch_xla.core.xla_model as xm
+except ImportError:
+    xm = None
+
 
 class UserStableDiffusion3Pipeline(StableDiffusion3Pipeline):
+    """SD3 Pipeline with fairness-aware embedding modification support."""
+
     @torch.no_grad()
     @replace_example_docstring(EXAMPLE_DOC_STRING)
     def __call__(
         self,
-        prompt: Union[str, List[str]] = None,
-        prompt_2: Optional[Union[str, List[str]]] = None,
-        prompt_3: Optional[Union[str, List[str]]] = None,
-        height: Optional[int] = None,
-        width: Optional[int] = None,
+        prompt: str | list[str] | None = None,
+        prompt_2: str | list[str] | None = None,
+        prompt_3: str | list[str] | None = None,
+        height: int | None = None,
+        width: int | None = None,
         num_inference_steps: int = 28,
-        timesteps: List[int] = None,
+        timesteps: list[int] | None = None,
         guidance_scale: float = 7.0,
-        negative_prompt: Optional[Union[str, List[str]]] = None,
-        negative_prompt_2: Optional[Union[str, List[str]]] = None,
-        negative_prompt_3: Optional[Union[str, List[str]]] = None,
-        num_images_per_prompt: Optional[int] = 1,
-        generator: Optional[Union[torch.Generator, List[torch.Generator]]] = None,
-        latents: Optional[torch.FloatTensor] = None,
-        prompt_embeds: Optional[torch.FloatTensor] = None,
-        negative_prompt_embeds: Optional[torch.FloatTensor] = None,
-        pooled_prompt_embeds: Optional[torch.FloatTensor] = None,
-        negative_pooled_prompt_embeds: Optional[torch.FloatTensor] = None,
-        output_type: Optional[str] = "pil",
+        negative_prompt: str | list[str] | None = None,
+        negative_prompt_2: str | list[str] | None = None,
+        negative_prompt_3: str | list[str] | None = None,
+        num_images_per_prompt: int | None = 1,
+        generator: torch.Generator | list[torch.Generator] | None = None,
+        latents: torch.FloatTensor | None = None,
+        prompt_embeds: torch.FloatTensor | None = None,
+        negative_prompt_embeds: torch.FloatTensor | None = None,
+        pooled_prompt_embeds: torch.FloatTensor | None = None,
+        negative_pooled_prompt_embeds: torch.FloatTensor | None = None,
+        *,
+        output_type: str | None = "pil",
         return_dict: bool = True,
-        joint_attention_kwargs: Optional[Dict[str, Any]] = None,
-        clip_skip: Optional[int] = None,
-        callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
-        callback_on_step_end_tensor_inputs: List[str] = ["latents"],
+        joint_attention_kwargs: dict[str, Any] | None = None,
+        clip_skip: int | None = None,
+        callback_on_step_end: Callable[[int, int, dict], None] | None = None,
+        callback_on_step_end_tensor_inputs: list[str] | None = None,
         max_sequence_length: int = 256,
-        **kwargs
+        **kwargs,
     ):
-        r"""
-        Function invoked when calling the pipeline for generation.
+        r"""Function invoked when calling the pipeline for generation.
 
         Args:
             prompt (`str` or `List[str]`, *optional*):
@@ -125,8 +147,10 @@ class UserStableDiffusion3Pipeline(StableDiffusion3Pipeline):
             [`~pipelines.stable_diffusion_3.StableDiffusion3PipelineOutput`] or `tuple`:
             [`~pipelines.stable_diffusion_3.StableDiffusion3PipelineOutput`] if `return_dict` is True, otherwise a
             `tuple`. When returning a tuple, the first element is a list with the generated images.
-        """
 
+        """
+        if callback_on_step_end_tensor_inputs is None:
+            callback_on_step_end_tensor_inputs = ["latents"]
         height = height or self.default_sample_size * self.vae_scale_factor
         width = width or self.default_sample_size * self.vae_scale_factor
 
@@ -164,35 +188,34 @@ class UserStableDiffusion3Pipeline(StableDiffusion3Pipeline):
         device = self._execution_device
 
         lora_scale = (
-            self.joint_attention_kwargs.get("scale", None) if self.joint_attention_kwargs is not None else None
+            self.joint_attention_kwargs.get("scale", None)
+            if self.joint_attention_kwargs is not None
+            else None
         )
-        
+
         # maple: Handle encoder selection by routing prompts to appropriate slots
-        if hasattr(self, 'usermode') and self.usermode.get("encoder"):
+        if hasattr(self, "usermode") and self.usermode.get("encoder"):
             encoder_type = self.usermode["encoder"].lower()
             encoder_slot = self.usermode.get("encoder_slot", None)
-            
+
             # For T5 encoders, default to slot 3 (since SD3's third encoder is T5)
             if encoder_slot is None:
-                if encoder_type.startswith('t5'):
+                if encoder_type.startswith("t5"):
                     encoder_slot = 3
-                elif encoder_type in ['openclip', 'clip-big']:
+                elif encoder_type in ["openclip", "clip-big"]:
                     encoder_slot = 2
                 else:  # CLIP or others
                     encoder_slot = 1
-            
+
             # Route the prompt to the appropriate encoder slot
             if encoder_slot == 2:
                 if prompt_2 is None:
                     prompt_2 = prompt
                 # Keep prompt for slot 1 to avoid empty prompt error
-            elif encoder_slot == 3:
-                if prompt_3 is None:
-                    prompt_3 = prompt
+            elif encoder_slot == 3 and prompt_3 is None:
+                prompt_3 = prompt
                 # Keep prompt for slot 1 to avoid empty prompt error
-                    
-            print(f"Routing prompt to encoder slot {encoder_slot} for {encoder_type}")
-        
+
         (
             prompt_embeds,
             negative_prompt_embeds,
@@ -217,22 +240,46 @@ class UserStableDiffusion3Pipeline(StableDiffusion3Pipeline):
             lora_scale=lora_scale,
         )
 
-
         # maple: Extract features for embeddings
         if "extract" in self.usermode:
-            self.processor.extract_embedding(prompt_embeds, pooled_prompt_embeds, self.processor, usermode=self.usermode, imagemodel = "sd3.0", exp_dir = self.exp_dir, **kwargs)
-            return
+            self.processor.extract_embedding(
+                prompt_embeds,
+                pooled_prompt_embeds,
+                self.processor,
+                usermode=self.usermode,
+                imagemodel="sd3.0",
+                exp_dir=self.exp_dir,
+                **kwargs,
+            )
+            return None
 
         if self.do_classifier_free_guidance:
             prompt_embeds = torch.cat([negative_prompt_embeds, prompt_embeds], dim=0)
-            pooled_prompt_embeds = torch.cat([negative_pooled_prompt_embeds, pooled_prompt_embeds], dim=0)
+            pooled_prompt_embeds = torch.cat(
+                [negative_pooled_prompt_embeds, pooled_prompt_embeds],
+                dim=0,
+            )
 
         # maple: Modify embeddings with our fpca
-        prompt_embeds, pooled_prompt_embeds = self.processor.modify_embedding(self, prompt_embeds, pooled_prompt_embeds, usermode = self.usermode, exp_dir = self.exp_dir)
+        prompt_embeds, pooled_prompt_embeds = self.processor.modify_embedding(
+            self,
+            prompt_embeds,
+            pooled_prompt_embeds,
+            usermode=self.usermode,
+            exp_dir=self.exp_dir,
+        )
 
         # 4. Prepare timesteps
-        timesteps, num_inference_steps = retrieve_timesteps(self.scheduler, num_inference_steps, device, timesteps)
-        num_warmup_steps = max(len(timesteps) - num_inference_steps * self.scheduler.order, 0)
+        timesteps, num_inference_steps = retrieve_timesteps(
+            self.scheduler,
+            num_inference_steps,
+            device,
+            timesteps,
+        )
+        num_warmup_steps = max(
+            len(timesteps) - num_inference_steps * self.scheduler.order,
+            0,
+        )
         self._num_timesteps = len(timesteps)
 
         # 5. Prepare latent variables
@@ -255,7 +302,11 @@ class UserStableDiffusion3Pipeline(StableDiffusion3Pipeline):
                     continue
 
                 # expand the latents if we are doing classifier free guidance
-                latent_model_input = torch.cat([latents] * 2) if self.do_classifier_free_guidance else latents
+                latent_model_input = (
+                    torch.cat([latents] * 2)
+                    if self.do_classifier_free_guidance
+                    else latents
+                )
                 # broadcast to batch dimension in a way that's compatible with ONNX/Core ML
                 timestep = t.expand(latent_model_input.shape[0])
 
@@ -271,16 +322,22 @@ class UserStableDiffusion3Pipeline(StableDiffusion3Pipeline):
                 # perform guidance
                 if self.do_classifier_free_guidance:
                     noise_pred_uncond, noise_pred_text = noise_pred.chunk(2)
-                    noise_pred = noise_pred_uncond + self.guidance_scale * (noise_pred_text - noise_pred_uncond)
+                    noise_pred = noise_pred_uncond + self.guidance_scale * (
+                        noise_pred_text - noise_pred_uncond
+                    )
 
                 # compute the previous noisy sample x_t -> x_t-1
                 latents_dtype = latents.dtype
-                latents = self.scheduler.step(noise_pred, t, latents, return_dict=False)[0]
+                latents = self.scheduler.step(
+                    noise_pred,
+                    t,
+                    latents,
+                    return_dict=False,
+                )[0]
 
-                if latents.dtype != latents_dtype:
-                    if torch.backends.mps.is_available():
-                        # some platforms (eg. apple mps) misbehave due to a pytorch bug: https://github.com/pytorch/pytorch/pull/99272
-                        latents = latents.to(latents_dtype)
+                if latents.dtype != latents_dtype and torch.backends.mps.is_available():
+                    # some platforms (eg. apple mps) misbehave due to a pytorch bug: https://github.com/pytorch/pytorch/pull/99272
+                    latents = latents.to(latents_dtype)
 
                 if callback_on_step_end is not None:
                     callback_kwargs = {}
@@ -290,13 +347,19 @@ class UserStableDiffusion3Pipeline(StableDiffusion3Pipeline):
 
                     latents = callback_outputs.pop("latents", latents)
                     prompt_embeds = callback_outputs.pop("prompt_embeds", prompt_embeds)
-                    negative_prompt_embeds = callback_outputs.pop("negative_prompt_embeds", negative_prompt_embeds)
+                    negative_prompt_embeds = callback_outputs.pop(
+                        "negative_prompt_embeds",
+                        negative_prompt_embeds,
+                    )
                     negative_pooled_prompt_embeds = callback_outputs.pop(
-                        "negative_pooled_prompt_embeds", negative_pooled_prompt_embeds
+                        "negative_pooled_prompt_embeds",
+                        negative_pooled_prompt_embeds,
                     )
 
                 # call the callback, if provided
-                if i == len(timesteps) - 1 or ((i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0):
+                if i == len(timesteps) - 1 or (
+                    (i + 1) > num_warmup_steps and (i + 1) % self.scheduler.order == 0
+                ):
                     progress_bar.update()
 
                 if XLA_AVAILABLE:
@@ -306,7 +369,9 @@ class UserStableDiffusion3Pipeline(StableDiffusion3Pipeline):
             image = latents
 
         else:
-            latents = (latents / self.vae.config.scaling_factor) + self.vae.config.shift_factor
+            latents = (
+                latents / self.vae.config.scaling_factor
+            ) + self.vae.config.shift_factor
 
             image = self.vae.decode(latents, return_dict=False)[0]
             image = self.image_processor.postprocess(image, output_type=output_type)
@@ -318,6 +383,3 @@ class UserStableDiffusion3Pipeline(StableDiffusion3Pipeline):
             return (image,)
 
         return StableDiffusion3PipelineOutput(images=image)
-
-    
-    
