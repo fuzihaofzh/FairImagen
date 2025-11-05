@@ -48,6 +48,16 @@
       <b>FairPCA debiasing (gender)</b>
     </td>
   </tr>
+  <tr>
+    <td align="center">
+      <img src="./imgs/yoga_instructor_base.jpeg" alt="Baseline" width="400"/><br/>
+      <b>Baseline (no debiasing)</b>
+    </td>
+    <td align="center">
+      <img src="./imgs/yoga_instructor_our.jpeg" alt="FairPCA" width="400"/><br/>
+      <b>FairPCA debiasing (gender)</b>
+    </td>
+  </tr>
 </table>
 
 <p align="center"><i>These examples illustrate how FairPCA mitigates gender bias while preserving prompt fidelity.</i></p>
