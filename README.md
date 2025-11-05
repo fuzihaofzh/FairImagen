@@ -40,11 +40,11 @@
 <table>
   <tr>
     <td align="center">
-      <img src="https://private-user-images.githubusercontent.com/1419566/498914070-c60e9f3b-c902-45ca-bbc6-257f599fc704.jpeg?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjA4NzUzMTUsIm5iZiI6MTc2MDg3NTAxNSwicGF0aCI6Ii8xNDE5NTY2LzQ5ODkxNDA3MC1jNjBlOWYzYi1jOTAyLTQ1Y2EtYmJjNi0yNTdmNTk5ZmM3MDQuanBlZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEwMTklMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMDE5VDExNTY1NVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTE2NmE0ZjZlODgxNjg0NjE1ZDM0NTcyOWYwMDg2OTczNGMxMjRlMTM3NzZiNDFhYWVmMzA5YzJhODJlZjliMmUmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.wnTdplNkuYlUQ_B1BR7r58ycGp_1JyixMphZp-_x8hM" alt="Baseline" width="400"/><br/>
+      <img src="./imgs/firefighterbase.jpeg" alt="Baseline" width="400"/><br/>
       <b>Baseline (no debiasing)</b>
     </td>
     <td align="center">
-      <img src="https://private-user-images.githubusercontent.com/1419566/498914068-de881000-fa25-4409-803b-f104ebe3c92b.jpeg?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjA4NzUzMTUsIm5iZiI6MTc2MDg3NTAxNSwicGF0aCI6Ii8xNDE5NTY2LzQ5ODkxNDA2OC1kZTg4MTAwMC1mYTI1LTQ0MDktODAzYi1mMTA0ZWJlM2M5MmIuanBlZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTEwMTklMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUxMDE5VDExNTY1NVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTEwZWIyMGE3NmYzZmNlNjY3YWIzOTMwNWUyYTVkMDhkMjZlZjFhMTc5MTRjMTg2MDAzZWIwYzY5NTZmNTc5MjAmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.rInW78VxZHySKRE2jpsJ3u9HO10JYsI8YxqcjLtwUSY" alt="FairPCA" width="400"/><br/>
+      <img src="./imgs/fpca_gender_firefighter.jpeg" alt="FairPCA" width="400"/><br/>
       <b>FairPCA debiasing (gender)</b>
     </td>
   </tr>
