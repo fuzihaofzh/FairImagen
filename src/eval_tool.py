@@ -53,6 +53,9 @@ def img_evaluate(
     def to_tensor(im):
         return torch.from_numpy(np.asarray(im)).permute(2, 0, 1).float()
 
+    def to_tensor_normalized(im):
+        return torch.from_numpy(np.asarray(im)).permute(2, 0, 1).float() / 255.0
+
     big = Image.open(path).convert("RGB")
     w, h = size
     patches = [
@@ -61,10 +64,11 @@ def img_evaluate(
         for x in range(big.width // w)
     ]
     stack = torch.stack([to_tensor(p) for p in patches]).to(d)
+    stack_norm = torch.stack([to_tensor_normalized(p) for p in patches]).to(d)
     with torch.no_grad():
         acc = [min(1.0, c(i.unsqueeze(0), prompt).item() / 100 * 2.5) for i in stack]
-        mus = (m(stack) / 100).cpu().tolist()
-        niq = n(stack).cpu().tolist()
+        mus = (m(stack_norm) / 100).cpu().tolist()
+        niq = n(stack_norm).cpu().tolist()
         qiq = q(stack).cpu().tolist()
 
     attrs = ["gender", "race", "age"]
